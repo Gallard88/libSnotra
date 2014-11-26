@@ -44,16 +44,18 @@ int Snotra_Send(const char *module, const char *parameter, float value)
 {
   char  *buf;
   int bytes;
-  time_t t = time(NULL);
-  struct tm tm = *localtime(&t);
+  struct timeval  tv;
+
+  gettimeofday(&tv, NULL);
+  struct tm tm = *localtime(&tv.tv_sec);
 
   if ( Snotra_Fd < 0 ) {
     return -1;
   }
 
-  bytes = asprintf(&buf, "{\"Module\":\"%s\", \"Date\":\"%04d-%02d-%02d, %02d:%02d:%02d\",\"Parameter\":\"%s\", \"Value\": %lf }",
+  bytes = asprintf(&buf, "{\"Module\":\"%s\", \"Date\":\"%04d-%02d-%02d, %02d:%02d:%02d.%03d\",\"Parameter\":\"%s\", \"Value\": %lf }",
         module,
-        tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec,
+        tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, tv.tv_usec / 1000,
         parameter,
         value);
 
